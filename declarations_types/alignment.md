@@ -48,3 +48,89 @@ register指定子で宣言されたtypedef、ビットフィールド、関数�
 １、２、４、８、１６など2の累乗であるアラインメントを指定する。
 型のサイズよりも小さい値は使用してはいけない。
 
+
+structとunion型のアライメント:
+任意のメンバーの最大のアラインメントと同じになる。
+各メンバーのアラインメント要件が満たされるように、structの中に埋め込みバイトが追加される。
+
+宣言に複数のalignas指定子が存在する場合
+→そのstructのアラインメントは少なくとも最も大きな指定子の値になる。
+
+
+alignadの例：
+C++に移植可能なため、支援マクロalignofを使用する。
+動作は_Alignofを使用する場合と同じ。
+```lang:C
+// Compile with /std:c11
+
+#include <stdio.h>
+#include <stdalign.h>
+
+typedef struct 
+{
+    int value; // aligns on a 4-byte boundary. There will be 28 bytes of padding between value and alignas
+    alignas(32) char alignedMemory[32]; // assuming a 32 byte friendly cache alignment
+} cacheFriendly; // this struct will be 32-byte aligned because alignedMemory is 32-byte aligned and is the largest alignment specified in the struct
+
+int main()
+{
+    printf("sizeof(cacheFriendly): %d\n", sizeof(cacheFriendly)); // 4 bytes for int value + 32 bytes for alignedMemory[] + padding to ensure  alignment
+    printf("alignof(cacheFriendly): %d\n", alignof(cacheFriendly)); // 32 because alignedMemory[] is aligned on a 32-byte boundary
+
+    /* output
+        sizeof(cacheFriendly): 64
+        alignof(cacheFriendly): 32
+    */
+}
+```
+
+## alignofと_Alignof
+_Alignofとalignof：
+指定された型のアラインメントがバイト単位で返される。
+型size_tの値を返す。
+
+alignofの構文
+```lang:C
+alignof(type)
+_Alignof(type)
+```
+
+alignofの例
+```lang:C
+// Compile with /std:c11
+
+#include <stdalign.h>
+#include <stdio.h>
+
+int main()
+{
+    size_t alignment = alignof(short);
+    printf("alignof(short) = %d\n", alignment); // 2
+    printf("alignof(int) = %d\n", alignof(int)); // 4
+    printf("alignof(long) = %d\n", alignof(long)); // 4
+    printf("alignof(float) = %d\n", alignof(float)); // 4
+    printf("alignof(double) = %d\n", alignof(double)); // 8
+
+    typedef struct
+    {
+        int a;
+        double b;
+    } test;
+
+    printf("alignof(test) = %d\n", alignof(test)); // 8 because that is the alignment of the largest element in the structure
+
+    /* output
+        
+       alignof(short) = 2
+       alignof(int) = 4
+       alignof(long) = 4
+       alignof(float) = 4
+       alignof(double) = 8
+       alignof(test) = 8
+    */
+}
+```
+C++に移植可能であるため、支援マクロalignofを使用する。
+動作は、_Alignofを使用する場合と同じ。
+
+
