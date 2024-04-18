@@ -17,3 +17,8 @@ association:
  type-name : assignment-expression
  default : assignment-expression
 
+
+- assoc-listでは同じ型を風数回指定することはできない。
+- assoc-listでは、列挙型やその列挙型の基になる型など、相互に互換性のある型を指定することはできない。
+- 汎用選択に既定値がない場合、制御式の汎用結合リストは、互換性のある型名が1つだけ含まれている必要がある。
+
