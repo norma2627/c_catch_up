@@ -33,6 +33,7 @@ int main (void){
             for (int i = 0; i < n; i++){
                 putchar(isprint(buf[i] ? buf[i] : '.'));
             }
+            
             putchar('\n');
         }
         fclose(fp);
